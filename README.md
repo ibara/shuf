@@ -8,9 +8,9 @@ coreutils.
 Usage
 -----
 ```
-shuf [-n count] [-o outfile] [-rz] [file]
-shuf -e [-n count] [-o outfile] [-rz] [args ...]
-shuf -i lo-hi [-n count] [-o outfile] [-rz]
+shuf [-hv] [-n count] [-o outfile] [-rz] [file]
+shuf [-hv] -e [-n count] [-o outfile] [-rz] [args ...]
+shuf [-hv] -i lo-hi [-n count] [-o outfile] [-rz]
 ```
 See `shuf.1` for more details.
 

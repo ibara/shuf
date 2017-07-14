@@ -188,11 +188,14 @@ repledge(int oflag)
 static void
 usage(void)
 {
+	const char *name;
+
+	name = getprogname();
 
 	fprintf(stderr, "usage: %s [-hv] [-n count] [-o file] [-rz] [file]\n"
 		"       %s [-hv] -e [-n count] [-o file] [-rz] [args ...]\n"
 		"       %s [-hv] -i lo-hi [-n count] [-o file] [-rz]\n",
-		getprogname(), getprogname(), getprogname());
+		name, name, name);
 
 	exit(1);
 }
@@ -201,23 +204,19 @@ static void
 version(void)
 {
 
-	fputs("shuf 1.1\n", stderr);
-	fputs("Copyright (c) 2017 Brian Callahan ", stderr);
-	fputs("<bcallah@openbsd.org>\n\nPermission to use, copy, ", stderr);
-	fputs("modify, and distribute this software for any\npurpose", stderr);
-	fputs(" with or without fee is hereby granted, provided that", stderr);
-	fputs(" the above\ncopyright notice and this permission ", stderr);
-	fputs("notice appear in all copies.\n\nTHE SOFTWARE IS ", stderr);
-	fputs("PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL ", stderr);
-	fputs("WARRANTIES\nWITH REGARD TO THIS SOFTWARE INCLUDING ", stderr);
-	fputs("IMPLIED WARRANTIES OF\nMERCHANTABILITY AND FITNESS. ", stderr);
-	fputs("IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR\nANY ", stderr);
-	fputs("SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES ", stderr);
-	fputs("OR ANY DAMAGES\nWHATSOEVER RESULTING FROM LOSS OF USE", stderr);
-	fputs(", DATA OR PROFITS, WHETHER IN AN\nACTION OF CONTRACT,", stderr);
-	fputs(" NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF", stderr);
-	fputs("\nOR IN CONNECTION WITH THE USE OR PERFORMANCE OF ", stderr);
-	fputs("THIS SOFTWARE.\n", stderr);
+	fputs("shuf 1.2\n"
+"Copyright (c) 2017 Brian Callahan <bcallah@openbsd.org>\n\n"
+"Permission to use, copy, modify, and distribute this software for any\n"
+"purpose with or without fee is hereby granted, provided that the above\n"
+"copyright notice and this permission notice appear in all copies.\n\n"
+"THE SOFTWARE IS PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES\n"
+"WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF\n", stderr);
+	fputs(
+"MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR\n"
+"ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES\n"
+"WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN\n"
+"ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF\n"
+"OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.\n", stderr);
 
 	exit(1);
 }
