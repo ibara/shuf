@@ -201,7 +201,7 @@ static void
 version(void)
 {
 
-	fputs("shuf 1.3\n"
+	fputs("shuf 1.4\n"
 	      "Copyright (c) 2017 Brian Callahan <bcallah@openbsd.org>\n\n"
 	      "Permission to use, copy, modify, and distribute this software "
 	      "for any\npurpose with or without fee is hereby granted, "
@@ -249,7 +249,8 @@ main(int argc, char *argv[])
 			if (iflag++)
 				errx(1, "cannot have multiple -i");
 
-			argp = strchr(optarg, '-');
+			if ((argp = strchr(optarg, '-')) == NULL)
+				errx(1, "must provide lo and hi for -i");
 			*argp = '\0';
 
 			lo = strtonum(optarg, 0, INT_MAX, &errstr);
