@@ -201,7 +201,7 @@ static void
 version(void)
 {
 
-	fputs("shuf 1.4\n"
+	fputs("shuf 1.5\n"
 	      "Copyright (c) 2017 Brian Callahan <bcallah@openbsd.org>\n\n"
 	      "Permission to use, copy, modify, and distribute this software "
 	      "for any\npurpose with or without fee is hereby granted, "
@@ -303,6 +303,8 @@ main(int argc, char *argv[])
 		ofile = stdout;
 
 	if (eflag) {
+		if (argc < 1)
+			errx(1, "must provide at least one argument with -e");
 		repledge(oflag);
 		shufecho(argc, argv);
 	} else if (iflag) {
