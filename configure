@@ -59,7 +59,7 @@ arc4randomuniformcheck() {
 #include <stdlib.h>
 int main(void){arc4random_uniform(0);return 0;}
 EOF
-  "$cc" "$tflags" -o /dev/null conftest.c > /dev/null 2>&1
+  "$cc" $tflags -o /dev/null conftest.c > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
     rm -f conftest.c
     return 1
@@ -74,7 +74,7 @@ getprognamecheck() {
 #include <stdlib.h>
 int main(void){getprogname();return 0;}
 EOF
-  "$cc" "$tflags" -o /dev/null conftest.c > /dev/null 2>&1
+  "$cc" $tflags -o /dev/null conftest.c > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
     rm -f conftest.c
     return 1
@@ -90,7 +90,7 @@ libbsdcheck() {
 int main(void){strtonum(NULL, 0, 0, NULL);return 0;}
 EOF
   tlibs="-L/usr/local/lib -L/usr/pkg/lib -L/opt/lib -lbsd"
-  "$cc" "$tflags" -o /dev/null conftest.c "$tlibs" > /dev/null 2>&1
+  "$cc" $tflags -o /dev/null conftest.c $tlibs > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
     rm -f conftest.c
     return 1
@@ -105,7 +105,7 @@ strtonumcheck() {
 #include <stdlib.h>
 int main(void){strtonum(NULL, 0, 0, NULL);return 0;}
 EOF
-  "$cc" "$tflags" -o /dev/null conftest.c > /dev/null 2>&1
+  "$cc" $tflags -o /dev/null conftest.c > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
     rm -f conftest.c
     return 1
