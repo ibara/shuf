@@ -23,14 +23,14 @@ Because of its use of OpenBSD
 non-\*BSD users may need to install
 [libbsd](https://libbsd.freedesktop.org/) to compile `shuf`.
 
+`configure` will figure this out for you.
+
 Compiling
 ---------
 ```
-$ make && sudo make install
-```
-or on non-\*BSD systems:
-```
-$ make nonbsd && sudo make install
+./configure
+$ make
+$ sudo make install
 ```
 
 Reporting bugs

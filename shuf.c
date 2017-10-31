@@ -143,7 +143,7 @@ shufintegers(int range, int lo)
 
 	if (rflag) {
 		while ((most == -1 ? 1 : most-- > 0))
-			fprintf(ofile, "%d%c",
+			fprintf(ofile, "%u%c",
 				arc4random_uniform(range) + lo, delimiter);
 	} else {
 		for (i = 0; i < range; i++)
@@ -201,7 +201,7 @@ static void
 version(void)
 {
 
-	fputs("shuf 1.5\n"
+	fputs("shuf 1.6\n"
 	      "Copyright (c) 2017 Brian Callahan <bcallah@openbsd.org>\n\n"
 	      "Permission to use, copy, modify, and distribute this software "
 	      "for any\npurpose with or without fee is hereby granted, "
