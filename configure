@@ -112,6 +112,21 @@ EOF
   fi
 }
 
+reallocarraycheck() {
+  cat << EOF > conftest.c
+#include <stdlib.h>
+int main(void){reallocarray(NULL, 0, 0);return 0;}
+EOF
+  $cc $tflags -o conftest conftest.c > /dev/null 2>&1
+  if [ $? -eq 0 ] ; then
+    rm -f conftest conftest.c
+    return 0
+  else
+    rm -f conftest conftest.c
+    return 1
+  fi
+}
+
 strtonumcheck() {
   cat << EOF > conftest.c
 #include <stdlib.h>
@@ -186,6 +201,15 @@ if [ $? -eq 0 ] ; then
   cflags="$cflags -DHAVE_PLEDGE"
   echo "yes"
 else
+  echo "no"
+fi
+
+printf "checking for reallocarray... "
+reallocarraycheck
+if [ $? -eq 0 ] ; then
+  echo "yes"
+else
+  libbsd=1
   echo "no"
 fi
 

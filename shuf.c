@@ -26,7 +26,7 @@
 #include <bsd/unistd.h>
 #endif
 
-static FILE    *ofile = stdout;
+static FILE    *ofile;
 static char 	delimiter = '\n';
 static int 	most = -1, rflag;
 
@@ -200,7 +200,7 @@ static void
 version(void)
 {
 
-	fputs("shuf 1.7\n"
+	fputs("shuf 1.8\n"
 	      "Copyright (c) 2017-2018 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
@@ -294,6 +294,9 @@ main(int argc, char *argv[])
 	}
 	argc -= optind;
 	argv += optind;
+
+	if (oflag == 0)
+		ofile = stdout;
 
 	if (eflag == 0 && argc > 1)
 		errx(1, "extra operand '%s'", *++argv);
