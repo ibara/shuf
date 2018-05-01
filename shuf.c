@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Brian Callahan <bcallah@openbsd.org>
+ * Copyright (c) 2017-2018 Brian Callahan <bcallah@openbsd.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,7 +26,7 @@
 #include <bsd/unistd.h>
 #endif
 
-static FILE    *ofile;
+static FILE    *ofile = stdout;
 static char 	delimiter = '\n';
 static int 	most = -1, rflag;
 
@@ -135,8 +135,7 @@ shuffile(const char *input, int argn, size_t inputlen)
 static void
 shufintegers(int range, int lo)
 {
-	int    *args = NULL;
-	int 	argt, i, j;
+	int    *args = NULL, argt, i, j;
 
 	if ((args = reallocarray(args, range, sizeof(int))) == NULL)
 		errx(1, "range size will exhaust memory");
@@ -169,7 +168,7 @@ shufintegers(int range, int lo)
 static void
 repledge(int oflag)
 {
-#ifdef __OpenBSD__
+#ifdef HAVE_PLEDGE
 	const char     *new;
 
 	if (oflag)
@@ -185,7 +184,7 @@ repledge(int oflag)
 static void
 usage(void)
 {
-	const char *name;
+	const char     *name;
 
 	name = getprogname();
 
@@ -201,10 +200,10 @@ static void
 version(void)
 {
 
-	fputs("shuf 1.6\n"
-	      "Copyright (c) 2017 Brian Callahan <bcallah@openbsd.org>\n\n"
-	      "Permission to use, copy, modify, and distribute this software "
-	      "for any\npurpose with or without fee is hereby granted, "
+	fputs("shuf 1.7\n"
+	      "Copyright (c) 2017-2018 Brian Callahan <bcallah@openbsd.org>\n"
+	      "\nPermission to use, copy, modify, and distribute this software"
+	      " for any\npurpose with or without fee is hereby granted, "
 	      "provided that the above\ncopyright notice and this permission "
 	      "notice appear in all copies.\n\nTHE SOFTWARE IS PROVIDED \"AS "
 	      "IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES\nWITH REGARD TO "
@@ -229,7 +228,7 @@ main(int argc, char *argv[])
 	int 		eflag = 0, iflag = 0, oflag = 0;
 	size_t 		buflen = 0, bufsize = 1024;
 
-#ifdef __OpenBSD__
+#ifdef HAVE_PLEDGE
 	if (pledge("stdio rpath wpath cpath", NULL) == -1)
 		errx(1, "pledge");
 #endif
@@ -278,7 +277,7 @@ main(int argc, char *argv[])
 				errx(1, "cannot have multiple -o");
 
 			if ((ofile = fopen(optarg, "w")) == NULL)
-				err(1, "could not open %s", optarg);
+				err(1, "couldn't open output file %s", optarg);
 
 			break;
 		case 'r':
@@ -299,53 +298,55 @@ main(int argc, char *argv[])
 	if (eflag == 0 && argc > 1)
 		errx(1, "extra operand '%s'", *++argv);
 
-	if (oflag == 0)
-		ofile = stdout;
-
 	if (eflag) {
 		if (argc < 1)
 			errx(1, "must provide at least one argument with -e");
 		repledge(oflag);
 		shufecho(argc, argv);
-	} else if (iflag) {
-		repledge(oflag);
-		shufintegers(hi - lo + 1, lo);
-	} else {
-		if (argc == 0 || (argv[0][0] == '-' && argv[0][1] == '\0')) {
-			ifile = stdin;
-		} else {
-			if ((ifile = fopen(*argv, "r")) == NULL)
-				err(1, "could not open %s", argv[1]);
-		}
-
-		repledge(oflag);
-
-		if ((buf = malloc(bufsize)) == NULL)
-			err(1, "malloc failed");
-
-		while ((ch = fgetc(ifile)) != EOF) {
-			buf[buflen++] = ch;
-
-			if (buflen == bufsize) {
-				bufsize <<= 1;
-				if ((buf = realloc(buf, bufsize)) == NULL)
-					err(1, "realloc failed");
-			}
-			if (prev == delimiter)
-				++argn;
-			prev = ch;
-		}
-		buf[buflen] = '\0';
-
-		if (ifile != stdin)
-			fclose(ifile);
-
-		shuffile(buf, argn, buflen);
-
-		free(buf);
-		buf = NULL;
+		goto out;
 	}
 
+	if (iflag) {
+		repledge(oflag);
+		shufintegers(hi - lo + 1, lo);
+		goto out;
+	}
+
+	if (argc == 0 || (argv[0][0] == '-' && argv[0][1] == '\0')) {
+		ifile = stdin;
+	} else {
+		if ((ifile = fopen(*argv, "r")) == NULL)
+			err(1, "could not open %s", argv[1]);
+	}
+
+	repledge(oflag);
+
+	if ((buf = malloc(bufsize)) == NULL)
+		err(1, "malloc failed");
+
+	while ((ch = fgetc(ifile)) != EOF) {
+		buf[buflen++] = ch;
+
+		if (buflen == bufsize) {
+			bufsize <<= 1;
+			if ((buf = realloc(buf, bufsize)) == NULL)
+				err(1, "realloc failed");
+		}
+		if (prev == delimiter)
+			++argn;
+		prev = ch;
+	}
+	buf[buflen] = '\0';
+
+	if (ifile != stdin)
+		fclose(ifile);
+
+	shuffile(buf, argn, buflen);
+
+	free(buf);
+	buf = NULL;
+
+out:
 	if (oflag)
 		fclose(ofile);
 

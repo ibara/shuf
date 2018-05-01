@@ -2,7 +2,7 @@ shuf
 ====
 `shuf` is a utility that outputs a random permutation of its input lines.
 
-It is a BSD-licensed implementation of the `shuf(1)` utility from GNU
+It is an ISC licensed reimplementation of the `shuf(1)` utility from GNU
 coreutils.
 
 Usage
