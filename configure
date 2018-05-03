@@ -232,6 +232,7 @@ if [ $libbsd -eq 1 ] ; then
   fi
   cflags="$cflags -DLIBBSD"
   libs=" -lbsd"
+  echo "yes"
 fi
 
 printf "creating Makefile... "
