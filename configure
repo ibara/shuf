@@ -8,7 +8,7 @@ cccheck() {
 cat << EOF > conftest.c
 int main(void){return 0;}
 EOF
-    $CC -o conftest conftest.c > /dev/null 2>&1
+    $CC $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
     if [ $? -eq 0 ] ; then
       ./conftest
       if [ $? -eq 0 ] ; then
@@ -30,7 +30,7 @@ cat << EOF > conftest.c
 int main(void){return 0;}
 EOF
 
-    $compiler -o conftest conftest.c > /dev/null 2>&1
+    $compiler $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
 
     if [ $? -eq 0 ] ; then
       ./conftest
@@ -173,8 +173,7 @@ os=`uname -s`
 echo "$os"
 
 if [ "x$os" = "xNetBSD" ] ; then
-  tflags="-D_OPENBSD_SOURCE"
-  cflags="$cflags $tflags"
+  cflags="$cflags -D_OPENBSD_SOURCE"
 fi
 
 printf "checking for arc4random_uniform... "
@@ -241,6 +240,16 @@ cat << EOF > Makefile
 
 CC =		$cc
 CFLAGS =	$cflags
+EOF
+
+if [ ! -z "$ldflags" ] ; then
+  cat << EOF >> Makefile
+LDFLAGS =	$ldflags
+EOF
+fi
+
+cat << EOF >> Makefile
+
 PREFIX ?=	/usr/local
 
 all:
