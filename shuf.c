@@ -134,7 +134,7 @@ shufintegers(int range, int lo)
 	int    *args = NULL, argt, i, j;
 
 	if ((args = reallocarray(args, range, sizeof(int))) == NULL)
-		errx(1, "shufintegers");
+		errx(1, "range size will exhaust memory");
 
 	if (rflag) {
 		while ((most == -1 ? 1 : most-- > 0))
@@ -196,7 +196,7 @@ static void
 version(void)
 {
 
-	fputs("shuf 1.9\n"
+	fputs("shuf 2.0\n"
 	      "Copyright (c) 2017-2018 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
