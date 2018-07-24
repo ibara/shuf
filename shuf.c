@@ -35,25 +35,23 @@ static int 	most = -1, rflag;
  */
 
 static void
-printshuf(int argn, char *args[], int ind, size_t len)
+printshuf(char *args[], int ind)
 {
 
-	if (argn > 1)
-		len = strlen(args[ind]);
-	fwrite(args[ind], len, 1, ofile);
+	fwrite(args[ind], strlen(args[ind]), 1, ofile);
 	fwrite(&delimiter, 1, 1, ofile);
 }
 
 static void
-randomshuf(int argn, char *args[], size_t len)
+randomshuf(int argn, char *args[])
 {
 
 	while ((most == -1 ? 1 : most-- > 0))
-		printshuf(argn, args, arc4random_uniform(argn), len);
+		printshuf(args, arc4random_uniform(argn));
 }
 
 static void
-shuf(int argn, char *args[], size_t len)
+shuf(int argn, char *args[])
 {
 	char   *argt;
 	int 	i, j;
@@ -68,7 +66,7 @@ shuf(int argn, char *args[], size_t len)
 	most = (most == -1 ? argn : most > argn ? argn : most);
 
 	for (i = 0; i < most; i++)
-		printshuf(argn, args, i, len);
+		printshuf(args, i);
 }
 
 static void
@@ -76,9 +74,9 @@ shufecho(int argn, char *args[])
 {
 
 	if (rflag)
-		randomshuf(argn, args, strlen(args[0]));
+		randomshuf(argn, args);
 	else
-		shuf(argn, args, strlen(args[0]));
+		shuf(argn, args);
 }
 
 static void
@@ -87,12 +85,10 @@ shuffile(const char *input, int argn, size_t inputlen)
 	const char     *s;
 	char	      **args = NULL, *argt;
 	int 		i = 0;
-	size_t 		len, savedinputlen;
+	size_t 		len;
 
 	if ((args = reallocarray(args, argn, sizeof(char *))) == NULL)
-		errx(1, "memory exhausted");
-
-	savedinputlen = inputlen;
+		errx(1, "shuffile");
 
 	while (i < argn) {
 		for (s = input; *s != delimiter; s++) {
@@ -119,9 +115,9 @@ shuffile(const char *input, int argn, size_t inputlen)
 	most = (most < argn ? most : argn);
 
 	if (rflag)
-		randomshuf(argn, args, savedinputlen);
+		randomshuf(argn, args);
 	else
-		shuf(argn, args, savedinputlen);
+		shuf(argn, args);
 
 	for (i = 0; i < argn; i++) {
 		free(args[i]);
@@ -138,7 +134,7 @@ shufintegers(int range, int lo)
 	int    *args = NULL, argt, i, j;
 
 	if ((args = reallocarray(args, range, sizeof(int))) == NULL)
-		errx(1, "range size will exhaust memory");
+		errx(1, "shufintegers");
 
 	if (rflag) {
 		while ((most == -1 ? 1 : most-- > 0))
@@ -200,7 +196,7 @@ static void
 version(void)
 {
 
-	fputs("shuf 1.8\n"
+	fputs("shuf 1.9\n"
 	      "Copyright (c) 2017-2018 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
@@ -223,10 +219,10 @@ main(int argc, char *argv[])
 {
 	FILE	       *ifile;
 	const char     *errstr;
-	char	       *argp, *buf;
+	char	       *argp, *buf, *nbuf;
 	int 		argn = 1, ch, hi = 0, lo = 0, prev = 1;
 	int 		eflag = 0, iflag = 0, oflag = 0;
-	size_t 		buflen = 0, bufsize = 1024;
+	size_t 		buflen = 0, bufsize = 1024, nbufsize;
 
 #ifdef HAVE_PLEDGE
 	if (pledge("stdio rpath wpath cpath", NULL) == -1)
@@ -331,9 +327,14 @@ main(int argc, char *argv[])
 		buf[buflen++] = ch;
 
 		if (buflen == bufsize) {
-			bufsize <<= 1;
-			if ((buf = realloc(buf, bufsize)) == NULL)
-				err(1, "realloc failed");
+			nbufsize = bufsize << 1;
+			if ((nbuf = realloc(buf, nbufsize)) == NULL) {
+				free(buf);
+				buf = NULL;
+				err(1, "main");
+			}
+			buf = nbuf;
+			bufsize = nbufsize;
 		}
 		if (prev == delimiter)
 			++argn;
