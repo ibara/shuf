@@ -17,11 +17,12 @@ See `shuf.1` for more details.
 Dependencies
 ------------
 Because of its use of OpenBSD
-[arc4random_uniform(3)](https://man.openbsd.org/arc4random_uniform.3),
-[getprogname(3)](https://man.openbsd.org/getprogname.3), and
-[strtonum(3)](https://man.openbsd.org/strtonum.3),
+[`arc4random_uniform(3)`](https://man.openbsd.org/arc4random_uniform.3),
+[`getprogname(3)`](https://man.openbsd.org/getprogname.3),
+[`reallocarray(3)`](https://man.openbsd.org/reallocarray.3), and
+[`strtonum(3)`](https://man.openbsd.org/strtonum.3),
 non-\*BSD users may need to install
-[libbsd](https://libbsd.freedesktop.org/) to compile `shuf`.
+[`libbsd`](https://libbsd.freedesktop.org/) to compile `shuf`.
 
 `configure` will figure this out for you.
 
@@ -51,7 +52,8 @@ ISC license. See `LICENSE` for details.
 
 Download
 --------
-Tarballs are available here: https://devio.us/~bcallah/shuf/
+Tarballs are available under the Releases tab.
+Please use the versioned tarball instead of the auto-generated tarballs.
 
 Source code
 -----------
