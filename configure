@@ -12,7 +12,7 @@ EOF
     if [ $? -eq 0 ] ; then
       ./conftest
       if [ $? -eq 0 ] ; then
-	rm -f conftest conftest.c
+	rm -f conftest conftest.o conftest.c
 	cc="$CC"
 	return 0
       else
@@ -21,7 +21,7 @@ EOF
 	exit 1
       fi
     else
-      rm -f conftest conftest.c
+      rm -f conftest conftest.o conftest.c
     fi
   fi
 
@@ -35,7 +35,7 @@ EOF
     if [ $? -eq 0 ] ; then
       ./conftest
       if [ $? -eq 0 ] ; then
-	rm -f conftest conftest.c
+	rm -f conftest conftest.o conftest.c
 	cc="$compiler"
 	return 0
       else
@@ -44,7 +44,7 @@ EOF
 	exit 1
       fi
     else
-      rm -f conftest conftest.c
+      rm -f conftest conftest.o conftest.c
     fi
   done
   return 1
@@ -55,12 +55,12 @@ arc4randomuniformcheck() {
 #include <stdlib.h>
 int main(void){arc4random_uniform(0);return 0;}
 EOF
-  "$cc" $tflags -o /dev/null conftest.c > /dev/null 2>&1
+  "$cc" $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
-    rm -f conftest.c
+    rm -f conftest conftest.o conftest.c
     return 0
   else
-    rm -f conftest.c
+    rm -f conftest conftest.o conftest.c
     return 1
   fi
 }
@@ -70,12 +70,12 @@ getprognamecheck() {
 #include <stdlib.h>
 int main(void){getprogname();return 0;}
 EOF
-  "$cc" $tflags -o /dev/null conftest.c > /dev/null 2>&1
+  "$cc" $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
-    rm -f conftest.c
+    rm -f conftest conftest.o conftest.c
     return 0
   else
-    rm -f conftest.c
+    rm -f conftest conftest.o conftest.c
     return 1
   fi
 }
@@ -85,14 +85,12 @@ libbsdcheck() {
 #include <bsd/stdlib.h>
 int main(void){strtonum(NULL, 0, 0, NULL);return 0;}
 EOF
-  tincs="-I/usr/local/include -I/usr/pkg/include -I/opt/include"
-  tlibs="-L/usr/local/lib -L/usr/pkg/lib -L/opt/lib -lbsd"
-  "$cc" $tincs $tflags -o /dev/null conftest.c $tlibs > /dev/null 2>&1
+  "$cc" $cflags $ldflags -o conftest conftest.c -lbsd > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
-    rm -f conftest.c
+    rm -f conftest conftest.o conftest.c
     return 0
   else
-    rm -f conftest.c
+    rm -f conftest conftest.o conftest.c
     return 1
   fi
 }
@@ -102,12 +100,12 @@ pledgecheck() {
 #include <unistd.h>
 int main(void){pledge(NULL,NULL);return 0;}
 EOF
-  $cc $tflags -o conftest conftest.c > /dev/null 2>&1
+  $cc $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
-    rm -f conftest conftest.c
+    rm -f conftest conftest.o conftest.c
     return 0
   else
-    rm -f conftest conftest.c
+    rm -f conftest conftest.o conftest.c
     return 1
   fi
 }
@@ -117,12 +115,12 @@ reallocarraycheck() {
 #include <stdlib.h>
 int main(void){reallocarray(NULL, 0, 0);return 0;}
 EOF
-  $cc $tflags -o conftest conftest.c > /dev/null 2>&1
+  $cc $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
-    rm -f conftest conftest.c
+    rm -f conftest conftest.o conftest.c
     return 0
   else
-    rm -f conftest conftest.c
+    rm -f conftest conftest.o conftest.c
     return 1
   fi
 }
@@ -132,12 +130,12 @@ strtonumcheck() {
 #include <stdlib.h>
 int main(void){strtonum(NULL, 0, 0, NULL);return 0;}
 EOF
-  "$cc" $tflags -o /dev/null conftest.c > /dev/null 2>&1
+  "$cc" $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
-    rm -f conftest.c
+    rm -f conftest conftest.o conftest.c
     return 0
   else
-    rm -f conftest.c
+    rm -f conftest conftest.o conftest.c
     return 1
   fi
 }
@@ -150,6 +148,10 @@ if [ ! -z "$CFLAGS" ] ; then
   cflags="$CFLAGS"
 else
   cflags=""
+fi
+
+if [ ! -z "$CPPFLAGS" ] ; then
+  cflags="$cflags $CPPFLAGS"
 fi
 
 if [ ! -z "$LDFLAGS" ] ; then
