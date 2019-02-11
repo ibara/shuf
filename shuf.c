@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2018 Brian Callahan <bcallah@openbsd.org>
+ * Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -196,8 +196,8 @@ static void
 version(void)
 {
 
-	fputs("shuf 2.0\n"
-	      "Copyright (c) 2017-2018 Brian Callahan <bcallah@openbsd.org>\n"
+	fputs("shuf 2.1\n"
+	      "Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
 	      "provided that the above\ncopyright notice and this permission "
@@ -315,7 +315,7 @@ main(int argc, char *argv[])
 		ifile = stdin;
 	} else {
 		if ((ifile = fopen(*argv, "r")) == NULL)
-			err(1, "could not open %s", argv[1]);
+			err(1, "could not open %s", *argv);
 	}
 
 	repledge(oflag);
