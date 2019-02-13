@@ -196,7 +196,7 @@ static void
 version(void)
 {
 
-	fputs("shuf 2.1\n"
+	fputs("shuf 2.2\n"
 	      "Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
@@ -222,7 +222,7 @@ main(int argc, char *argv[])
 	char	       *argp, *buf, *nbuf;
 	int 		argn = 1, ch, hi = 0, lo = 0, prev = 1;
 	int 		eflag = 0, iflag = 0, oflag = 0;
-	size_t 		buflen = 0, bufsize = 1024, nbufsize;
+	size_t 		buflen = 0, bufsize = 8192, nbufsize;
 
 #ifdef HAVE_PLEDGE
 	if (pledge("stdio rpath wpath cpath", NULL) == -1)
@@ -345,7 +345,8 @@ main(int argc, char *argv[])
 	if (ifile != stdin)
 		fclose(ifile);
 
-	shuffile(buf, argn, buflen);
+	if (buflen > 0)
+		shuffile(buf, argn, buflen);
 
 	free(buf);
 	buf = NULL;
