@@ -88,7 +88,7 @@ shuffile(const char *input, int argn, size_t inputlen)
 	size_t 		len;
 
 	if ((args = reallocarray(args, argn, sizeof(char *))) == NULL)
-		errx(1, "shuffile");
+		err(1, "shuffile");
 
 	while (i < argn) {
 		for (s = input; *s != delimiter; s++) {
@@ -98,7 +98,7 @@ shuffile(const char *input, int argn, size_t inputlen)
 		len = s - input;
 
 		if ((args[i] = malloc(len + 1)) == NULL)
-			err(1, "malloc");
+			err(1, "shuffile");
 		argt = args[i++];
 
 		while (len-- > 0)
@@ -106,10 +106,7 @@ shuffile(const char *input, int argn, size_t inputlen)
 		*argt = '\0';
 
 		input++;
-		if (inputlen > 0) {
-			if (--inputlen == 0)
-				break;
-		}
+		--inputlen;
 	}
 
 	most = (most < argn ? most : argn);
@@ -134,12 +131,13 @@ shufintegers(int range, int lo)
 	int    *args = NULL, argt, i, j;
 
 	if ((args = reallocarray(args, range, sizeof(int))) == NULL)
-		errx(1, "range size will exhaust memory");
+		err(1, "range size will exhaust memory");
 
 	if (rflag) {
-		while ((most == -1 ? 1 : most-- > 0))
+		while ((most == -1 ? 1 : most-- > 0)) {
 			fprintf(ofile, "%u%c",
 				arc4random_uniform(range) + lo, delimiter);
+		}
 	} else {
 		for (i = 0; i < range; i++)
 			args[i] = lo + i;
@@ -196,7 +194,7 @@ static void
 version(void)
 {
 
-	fputs("shuf 2.2\n"
+	fputs("shuf 2.3\n"
 	      "Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
@@ -263,10 +261,11 @@ main(int argc, char *argv[])
 			break;
 		case 'n':
 			most = strtonum(optarg, 0, INT_MAX, &errstr);
-			if (errstr != NULL)
+			if (errstr != NULL) {
 				errx(1,
 				     "-n count must be from 0 to %d, not %s",
 				     INT_MAX, optarg);
+			}
 			break;
 		case 'o':
 			if (oflag++)
@@ -294,12 +293,12 @@ main(int argc, char *argv[])
 	if (oflag == 0)
 		ofile = stdout;
 
-	if (eflag == 0 && argc > 1)
-		errx(1, "extra operand '%s'", *++argv);
+	if (eflag == 0 && ((iflag == 1 && argc != 0) || argc > 1))
+		errx(1, "extra operand '%s'", iflag == 1 ? *argv : *++argv);
 
 	if (eflag) {
-		if (argc < 1)
-			errx(1, "must provide at least one argument with -e");
+		if (argc == 0)
+			goto out;
 		repledge(oflag);
 		shufecho(argc, argv);
 		goto out;
