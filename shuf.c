@@ -70,16 +70,6 @@ shuf(int argn, char *args[])
 }
 
 static void
-shufecho(int argn, char *args[])
-{
-
-	if (rflag)
-		randomshuf(argn, args);
-	else
-		shuf(argn, args);
-}
-
-static void
 shuffile(const char *input, int argn, size_t inputlen)
 {
 	const char     *s;
@@ -194,7 +184,7 @@ static void
 version(void)
 {
 
-	fputs("shuf 2.3\n"
+	fputs("shuf 2.4\n"
 	      "Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
@@ -300,7 +290,10 @@ main(int argc, char *argv[])
 		if (argc == 0)
 			goto out;
 		repledge(oflag);
-		shufecho(argc, argv);
+		if (rflag)
+			randomshuf(argc, argv);
+		else
+			shuf(argc, argv);
 		goto out;
 	}
 
