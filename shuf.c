@@ -184,7 +184,7 @@ static void __dead
 version(void)
 {
 
-	fputs("shuf 2.5\n"
+	fputs("shuf 2.6\n"
 	      "Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
@@ -213,7 +213,11 @@ main(int argc, char *argv[])
 	size_t 		buflen = 0, bufsize = 8192, nbufsize;
 
 #ifdef HAVE_PLEDGE
+#ifdef HAVE_UNVEIL
+	if (pledge("stdio rpath wpath cpath unveil", NULL) == -1)
+#else
 	if (pledge("stdio rpath wpath cpath", NULL) == -1)
+#endif
 		errx(1, "pledge");
 #endif
 
@@ -261,8 +265,18 @@ main(int argc, char *argv[])
 			if (oflag++)
 				errx(1, "cannot have multiple -o");
 
+#ifdef HAVE_UNVEIL
+			if (unveil(optarg, "wc") == -1)
+				err(1, "unveil");
+#endif
+
 			if ((ofile = fopen(optarg, "w")) == NULL)
 				err(1, "couldn't open output file %s", optarg);
+
+#ifdef HAVE_UNVEIL
+			if (unveil(NULL, NULL) == -1)
+				err(1, "unveil");
+#endif
 
 			break;
 		case 'r':
