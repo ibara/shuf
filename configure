@@ -65,6 +65,36 @@ EOF
   fi
 }
 
+deadcheck() {
+  cat << EOF > conftest.c
+#include <stdlib.h>
+__dead usage(void){exit(1);}int main(void){usage();return 0;}
+EOF
+  $cc $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
+  if [ $? -eq 0 ] ; then
+    rm -f conftest conftest.o conftest.c
+    return 0
+  else
+    rm -f conftest conftest.o conftest.c
+    return 1
+  fi
+}
+
+dead2check() {
+  cat << EOF > conftest.c
+#include <stdlib.h>
+__dead2 usage(void){exit(1);}int main(void){usage();return 0;}
+EOF
+  $cc $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
+  if [ $? -eq 0 ] ; then
+    rm -f conftest conftest.o conftest.c
+    return 0
+  else
+    rm -f conftest conftest.o conftest.c
+    return 1
+  fi
+}
+
 getprognamecheck() {
   cat << EOF > conftest.c
 #include <stdlib.h>
@@ -86,6 +116,21 @@ libbsdcheck() {
 int main(void){strtonum(NULL, 0, 0, NULL);return 0;}
 EOF
   "$cc" $cflags $ldflags -o conftest conftest.c -lbsd > /dev/null 2>&1
+  if [ $? -eq 0 ] ; then
+    rm -f conftest conftest.o conftest.c
+    return 0
+  else
+    rm -f conftest conftest.o conftest.c
+    return 1
+  fi
+}
+
+noreturncheck() {
+  cat << EOF > conftest.c
+#include <stdlib.h>
+__attribute__((__no_return__)) usage(void){exit(1);}int main(void){usage();return 0;}
+EOF
+  $cc $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
   if [ $? -eq 0 ] ; then
     rm -f conftest conftest.o conftest.c
     return 0
@@ -178,6 +223,31 @@ if [ "x$os" = "xNetBSD" ] ; then
   cflags="$cflags -D_OPENBSD_SOURCE"
 fi
 
+printf "checking for __dead... "
+deadcheck
+if [ $? -eq 0 ] ; then
+  echo "yes"
+else
+  echo "no"
+  printf "checking for __dead2... "
+  dead2check
+  if [ $? -eq 0 ] ; then
+    cflags="$cflags -D__dead=__dead2"
+    echo "yes"
+  else
+    echo "no"
+    printf "checking for __attribute__((__no_return__))... "
+    noreturncheck
+    if [ $? -eq 0 ] ; then
+      cflags="$cflags -D__dead=\"__attribute__((__no_return__))\""
+      echo "yes"
+    else
+      cflags="$cflags -D__dead="
+      echo "no"
+    fi
+  fi
+fi
+
 printf "checking for arc4random_uniform... "
 arc4randomuniformcheck
 if [ $? -eq 0 ] ; then
@@ -260,15 +330,34 @@ cat << EOF >> Makefile
 PREFIX ?=	/usr/local
 MANDIR ?=	\${PREFIX}/man
 
-PROG =		shuf
-OBJS =		shuf.o
+PROG =	shuf
+OBJS =	shuf.o
 
 all: \${OBJS}
-	\${CC} \${CFLAGS} \${LDFLAGS} -o \${PROG} \${OBJS} $libs
+	\${CC} \${LDFLAGS} -o \${PROG} \${OBJS} $libs
 
 install:
 	install -c -S -s -m 755 \${PROG} \${PREFIX}/bin
 	install -c -S -m 644 shuf.1 \${MANDIR}/man1/\${PROG}.1
+
+test:
+	@echo ====================================
+	@echo BSD shuf test suite
+	@echo ====================================
+	@echo Test 1: File input
+	@echo shuf shuf.c
+	@./shuf shuf.c || (echo Test 1 failed; exit 1)
+	@echo ====================================
+	@echo Test 2: -e flag, -n flag, -r flag
+	@echo shuf -e -n 10 -r Heads Tails
+	@./shuf -e -n 10 -r Heads Tails || (echo Test 2 failed; exit 1)
+	@echo ====================================
+	@echo Test 3: -i flag
+	@echo shuf -i 1-20 -n 10
+	@./shuf -i 1-20 -n 10 || (echo Test 3 failed; exit 1)
+	@echo ====================================
+	@echo All tests passed
+	@echo ====================================
 
 clean:
 	rm -f \${PROG} \${OBJS} \${PROG}.core

@@ -165,7 +165,7 @@ repledge(int oflag)
 #endif
 }
 
-static void
+static void __dead
 usage(void)
 {
 	const char     *name;
@@ -180,11 +180,11 @@ usage(void)
 	exit(1);
 }
 
-static void
+static void __dead
 version(void)
 {
 
-	fputs("shuf 2.4\n"
+	fputs("shuf 2.5\n"
 	      "Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
