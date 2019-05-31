@@ -185,21 +185,6 @@ EOF
   fi
 }
 
-unveilcheck() {
-  cat << EOF > conftest.c
-#include <unistd.h>
-int main(void){unveil(NULL,NULL);return 0;}
-EOF
-  $cc $cflags $ldflags -o conftest conftest.c > /dev/null 2>&1
-  if [ $? -eq 0 ] ; then
-    rm -f conftest conftest.o conftest.c
-    return 0
-  else
-    rm -f conftest conftest.o conftest.c
-    return 1
-  fi
-}
-
 prefix="/usr/local"
 libs=""
 libbsd=0
@@ -305,15 +290,6 @@ if [ $? -eq 0 ] ; then
   echo "yes"
 else
   libbsd=1
-  echo "no"
-fi
-
-printf "checking for unveil... "
-unveilcheck
-if [ $? -eq 0 ] ; then
-  cflags="$cflags -DHAVE_UNVEIL"
-  echo "yes"
-else
   echo "no"
 fi
 
