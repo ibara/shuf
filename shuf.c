@@ -38,8 +38,7 @@ static void
 printshuf(char *args[], int ind)
 {
 
-	fwrite(args[ind], strlen(args[ind]), 1, ofile);
-	fwrite(&delimiter, 1, 1, ofile);
+	fprintf(ofile, "%s%c", args[ind], delimiter);
 }
 
 static void
@@ -184,7 +183,7 @@ static void __dead
 version(void)
 {
 
-	fputs("shuf 2.7\n"
+	fputs("shuf 2.8\n"
 	      "Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
