@@ -77,7 +77,7 @@ shuffile(const char *input, int argn, size_t inputlen)
 	size_t 		len;
 
 	if ((args = reallocarray(args, argn, sizeof(char *))) == NULL)
-		err(1, "shuffile");
+		err(1, "could not create shuffile buffer");
 
 	while (i < argn) {
 		for (s = input; *s != delimiter; s++) {
@@ -87,7 +87,7 @@ shuffile(const char *input, int argn, size_t inputlen)
 		len = s - input;
 
 		if ((args[i] = malloc(len + 1)) == NULL)
-			err(1, "shuffile");
+			err(1, "could not create shuffile item buffer");
 		argt = args[i++];
 
 		while (len-- > 0)
@@ -160,7 +160,7 @@ repledge(int oflag)
 		new = "stdio";
 
 	if (pledge(new, NULL) == -1)
-		errx(1, "pledge");
+		err(1, "repledge");
 #endif
 }
 
@@ -183,7 +183,7 @@ static void __dead
 version(void)
 {
 
-	fputs("shuf 2.8\n"
+	fputs("shuf 2.9\n"
 	      "Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
@@ -213,26 +213,22 @@ main(int argc, char *argv[])
 
 #ifdef HAVE_PLEDGE
 	if (pledge("stdio rpath wpath cpath", NULL) == -1)
-		errx(1, "pledge");
+		err(1, "pledge");
 #endif
 
 	while ((ch = getopt(argc, argv, "ehi:n:o:rvz")) != -1) {
 		switch (ch) {
 		case 'e':
-			if (iflag)
-				errx(1, "cannot combine -e with -i");
 			eflag = 1;
 			break;
 		case 'h':
 			usage();
 		case 'i':
-			if (eflag)
-				errx(1, "cannot combine -i with -e");
 			if (iflag++)
-				errx(1, "cannot have multiple -i");
+				errx(1, "cannot have multiple -i options");
 
 			if ((argp = strchr(optarg, '-')) == NULL)
-				errx(1, "must provide lo and hi for -i");
+				errx(1, "must provide lo and hi for -i option");
 			*argp = '\0';
 
 			lo = strtonum(optarg, 0, INT_MAX, &errstr);
@@ -246,7 +242,7 @@ main(int argc, char *argv[])
 			if (lo >= hi)
 				errx(1, "lo is greater than or equal to hi");
 			if (hi == INT_MAX && lo == 0)
-				errx(1, "lo-hi range too large");
+				errx(1, "lo-hi range too large for -i option");
 			break;
 		case 'n':
 			most = strtonum(optarg, 0, INT_MAX, &errstr);
@@ -258,10 +254,10 @@ main(int argc, char *argv[])
 			break;
 		case 'o':
 			if (oflag++)
-				errx(1, "cannot have multiple -o");
+				errx(1, "cannot have multiple -o options");
 
 			if ((ofile = fopen(optarg, "w")) == NULL)
-				err(1, "couldn't open output file %s", optarg);
+				err(1, "could not open output file %s", optarg);
 
 			break;
 		case 'r':
@@ -278,6 +274,9 @@ main(int argc, char *argv[])
 	}
 	argc -= optind;
 	argv += optind;
+
+	if (eflag && iflag)
+		errx(1, "cannot combine -e and -i options");
 
 	if (oflag == 0)
 		ofile = stdout;
@@ -312,7 +311,7 @@ main(int argc, char *argv[])
 	repledge(oflag);
 
 	if ((buf = malloc(bufsize)) == NULL)
-		err(1, "malloc failed");
+		err(1, "could not create initial shuffle buffer");
 
 	while ((ch = fgetc(ifile)) != EOF) {
 		buf[buflen++] = ch;
@@ -322,7 +321,7 @@ main(int argc, char *argv[])
 			if ((nbuf = realloc(buf, nbufsize)) == NULL) {
 				free(buf);
 				buf = NULL;
-				err(1, "main");
+				err(1, "could not resize shuffle buffer");
 			}
 			buf = nbuf;
 			bufsize = nbufsize;

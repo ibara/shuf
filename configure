@@ -345,16 +345,16 @@ test:
 	@echo BSD shuf test suite
 	@echo ====================================
 	@echo Test 1: File input
-	@echo shuf shuf.c
-	@./shuf shuf.c || (echo Test 1 failed; exit 1)
+	@echo shuf LICENSE
+	@./shuf LICENSE || (echo Test 1 failed; exit 1)
 	@echo ====================================
 	@echo Test 2: -e flag, -n flag, -r flag
-	@echo shuf -e -n 10 -r Heads Tails
-	@./shuf -e -n 10 -r Heads Tails || (echo Test 2 failed; exit 1)
+	@echo shuf -e -n 5 -r Heads Tails
+	@./shuf -e -n 5 -r Heads Tails || (echo Test 2 failed; exit 1)
 	@echo ====================================
 	@echo Test 3: -i flag
-	@echo shuf -i 1-20 -n 10
-	@./shuf -i 1-20 -n 10 || (echo Test 3 failed; exit 1)
+	@echo shuf -i 1-10 -n 5
+	@./shuf -i 1-10 -n 5 || (echo Test 3 failed; exit 1)
 	@echo ====================================
 	@echo All tests passed
 	@echo ====================================
