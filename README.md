@@ -42,9 +42,10 @@ Patches always welcome.
 [`afl-fuzz`](http://lcamtuf.coredump.cx/afl/) but more testing is always
 better. Please file a bug report with crashing input if you find any.
 
-`shuf` should perfectly mimic `GNU shuf` behavior, with minimal exceptions
-(notably, `shuf` provides better error messages). If you discover any areas
-where `shuf` does not mimic `GNU shuf`, please file a bug report.
+`shuf` should perfectly mimic `GNU shuf` behavior, with minimal exceptions.
+Two notable exceptions are better error messages and more strict getopt
+handling. If you discover any areas where `shuf` does not mimic `GNU shuf`,
+please file a bug report.
 
 License
 -------
