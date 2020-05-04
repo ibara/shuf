@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>
+ * Copyright (c) 2017-2020 Brian Callahan <bcallah@openbsd.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -28,7 +28,7 @@
 
 static FILE    *ofile;
 static char 	delimiter = '\n';
-static int 	most = -1, rflag;
+static int 	eflag, most = -1, rflag, zflag;
 
 /*
  * shuf -- output a random permutation of input lines
@@ -37,8 +37,19 @@ static int 	most = -1, rflag;
 static void
 printshuf(char *args[], int ind)
 {
+	size_t size;
 
-	fprintf(ofile, "%s%c", args[ind], delimiter);
+	for (size = 0; args[ind][size] != delimiter; size++)
+		;
+
+	fwrite(args[ind], eflag ? size : size + 1, 1, ofile);
+
+	if (eflag) {
+		if (zflag)
+			fputc('\0', ofile);
+		else
+			fputc('\n', ofile);
+	}
 }
 
 static void
@@ -92,7 +103,7 @@ shuffile(const char *input, int argn, size_t inputlen)
 
 		while (len-- > 0)
 			*argt++ = *input++;
-		*argt = '\0';
+		*argt++ = delimiter;
 
 		input++;
 		--inputlen;
@@ -183,8 +194,8 @@ static void __dead
 version(void)
 {
 
-	fputs("shuf 2.9\n"
-	      "Copyright (c) 2017-2019 Brian Callahan <bcallah@openbsd.org>\n"
+	fputs("shuf 3.0\n"
+	      "Copyright (c) 2017-2020 Brian Callahan <bcallah@openbsd.org>\n"
 	      "\nPermission to use, copy, modify, and distribute this software"
 	      " for any\npurpose with or without fee is hereby granted, "
 	      "provided that the above\ncopyright notice and this permission "
@@ -208,7 +219,7 @@ main(int argc, char *argv[])
 	const char     *errstr;
 	char	       *argp, *buf, *nbuf;
 	int 		argn = 1, ch, hi = 0, lo = 0, prev = 1;
-	int 		eflag = 0, iflag = 0, oflag = 0;
+	int 		iflag = 0, oflag = 0;
 	size_t 		buflen = 0, bufsize = 8192, nbufsize;
 
 #ifdef HAVE_PLEDGE
@@ -266,6 +277,7 @@ main(int argc, char *argv[])
 		case 'v':
 			version();
 		case 'z':
+			zflag = 1;
 			delimiter = '\0';
 			break;
 		default:
@@ -288,6 +300,7 @@ main(int argc, char *argv[])
 		if (argc == 0)
 			goto out;
 		repledge(oflag);
+		delimiter = '\0';
 		if (rflag)
 			randomshuf(argc, argv);
 		else

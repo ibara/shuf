@@ -356,6 +356,11 @@ test:
 	@echo shuf -i 1-10 -n 5
 	@./shuf -i 1-10 -n 5 || (echo Test 3 failed; exit 1)
 	@echo ====================================
+	@echo Test 4: GitHub Issue #1
+	@printf "xa\ny\000a\nza\n" > .ghi1
+	@./shuf .ghi1 || (echo Test 4 failed; exit 1)
+	@rm .ghi1
+	@echo ====================================
 	@echo All tests passed
 	@echo ====================================
 
