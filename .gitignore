@@ -2,3 +2,4 @@ Makefile
 shuf
 *.o
 *.core
+.ghi1
